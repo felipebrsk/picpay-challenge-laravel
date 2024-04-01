@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Requests;
+namespace Tests\Unit\Requests\Transaction;
 
 use Tests\TestCase;
 use App\Http\Requests\Transaction\TransactionStoreRequest;

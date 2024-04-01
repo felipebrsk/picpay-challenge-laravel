@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Requests;
+namespace Tests\Unit\Requests\TransactionToken;
 
 use Tests\TestCase;
 use Tests\Traits\{HasDummyUser, TestUnitRequests};
