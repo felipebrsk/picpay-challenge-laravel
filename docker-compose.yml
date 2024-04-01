@@ -1,0 +1,72 @@
+version: "3.3"
+
+services:
+  app-picpay:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api-picpay-app
+    environment:
+      CHOKIDAR_USEPOLLING: 'true'
+    ports:
+      - "8000:80"
+    volumes:
+      - ".:/var/www"
+    networks:
+      - picpay
+    depends_on:
+      - redis
+      - mysql
+      - phpmyadmin
+
+  redis:
+    image: "redis:alpine"
+    container_name: api-picpay-redis
+    ports:
+      - "${FORWARD_REDIS_PORT:-6379}:6379"
+    volumes:
+      - "redis:/data"
+    networks:
+      - picpay
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      retries: 3
+      timeout: 5s
+
+  mysql:
+    container_name: api-picpay-db
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    volumes:
+      - "database:/var/lib/mysql"
+    networks:
+      - picpay
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    links:
+      - mysql
+    ports:
+      - 8001:80
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - picpay
+
+networks:
+  picpay:
+    driver: bridge
+
+volumes:
+  redis:
+    driver: local
+  database:
+    driver: local
